@@ -1,0 +1,279 @@
+
+/* Estil general del cos */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    text-align: center;
+    padding: 0px;
+    background-image: url('fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+   
+}
+
+/* Contenidor principal */
+.container {
+    margin-top: 100px;
+}
+
+.container h2 {
+    font-size: 36px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: black;
+}
+
+.button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-box {
+    background: white;
+    padding: 20px;
+    width: 300px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+/* Formulari d'inici de sessió */
+.login-form {
+    background: white;
+    padding: 30px;
+    width: 350px;
+    margin: 20px auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    margin-top: 50px;
+    text-align: left;
+}
+
+
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #000;
+}
+
+.login-form label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+    color: #000;
+}
+
+/* Camps d'entrada per login i registre */
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    color: #000;
+}
+
+/* Botons d'acció (login, registre) */
+.login-form button {
+    width: 100%;
+    margin-top: 15px;
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Panell superior amb info usuari i botó sortir */
+#userInfo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Nom d’usuari mostrat a l'interície d'usuari */
+.username-display {
+    font-size: 20px;
+    font-weight: bold;
+    color: #060606;
+    background-color: rgba(255, 255, 255, 0.6); 
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+/* Contenidor dels gràfics Grafana */
+.grafana-box {
+    margin-top: 30px;
+    background: white;
+    padding: 20px;
+    width: 850px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#loginButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#logoutButton {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#logoutButton:hover {
+    background-color: #cc0000;
+}
+
+#loginButton:hover {
+    background-color: #0056b3;
+}
+
+/* Botons de selecció de temps per Grafana */
+#timeButton {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Efecte de flotació al passar el cursor */
+#timeButton:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+#timeButton:active {
+    background-color: #003f6a;
+    transform: translateY(0);
+}
+
+#timeButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#timeButton:not(:last-child) {
+    margin-right: 10px;
+}
+
+/* Missatges d'error per login o registre */
+#errorMsg, #doctorErrorMsg {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Panell per metge amb registre d'usuaris */
+.doctor-panel {
+    background: white;
+    padding: 30px;
+    width: 400px;
+    margin: 50px auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: left;
+}
+
+.doctor-panel h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.doctor-panel label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.doctor-panel input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.doctor-panel button {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #0056b3;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.doctor-panel button:hover {
+    background-color: #003f6a;
+}
+
+/* Pantalla de càrrega amb spinner */
+#spinnerOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  /* Estil del cercle animat de càrrega */
+  .spinner {
+    border: 8px solid #f3f3f3; 
+    border-top: 8px solid #51585d; 
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Definim l'animació de rotació*/
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

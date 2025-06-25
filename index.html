@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dades Usuari</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        
+      // Comprovar si ja hi ha una sessió iniciada
+      window.onload = function () {
+            // Neteja valors i sessió anterior
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            localStorage.clear();
+
+            // Recupera dades d'usuari si existeixen a localStorage
+            const user_id = localStorage.getItem("user_id");
+            const radar_id = localStorage.getItem("radar_id");
+            const username = localStorage.getItem("username");
+            const isDoctor = localStorage.getItem("isDoctor") === "true";
+            console.log("isDoctor:", isDoctor);
+
+            // Control de visibilitat segons el rol
+            if (isDoctor) {
+                // Mostra el panell del metge
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("doctorPanel").style.display = "block";
+                document.getElementById("grafanaContainer").style.display = "none"; 
+            } else
+            if (user_id && radar_id) {
+                // Mostra la web de l'usuari si hi ha sessió iniciada
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("doctorPanel").style.display = "none";
+                document.getElementById("grafanaContainer").style.display = "block";
+                document.getElementById("usernameDisplay").innerText = "Usuari: " + username;
+                carregarGrafanaInici(user_id, radar_id);
+            }
+            else {
+                // Mostra el formulari d'inici de sessió si no hi ha sessió activa
+                document.getElementById("loginForm").style.display = "block";
+                document.getElementById("doctorPanel").style.display = "none";
+                document.getElementById("grafanaContainer").style.display = "none";
+                }
+        };
+        
+        // Funció per iniciar sessió
+        function iniciarSessio() {
+        
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+
+            if (!username || !password) {
+                document.getElementById("errorMsg").innerText = "Usuari i contrasenya requerits!";
+                return;
+            }
+         
+           document.getElementById("spinnerOverlay").style.display = "flex";
+        
+        // Envia petició POST al backend per validar login
+           fetch("http://localhost:3001/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                        throw new Error(data.error || data.message || "Error de connexió");
+                    });
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("spinnerOverlay").style.display = "none";
+            if (data.error) {
+                    document.getElementById("spinnerOverlay").style.display = "none";
+                    document.getElementById("errorMsg").innerText = data.error;
+                    return;
+                } 
+                
+                // Guarda les dades al localStorage per la sessió
+                localStorage.setItem("user_id", data.user_id);
+                localStorage.setItem("radar_id", data.radar_id);
+                localStorage.setItem("username", data.username);
+                localStorage.setItem("isDoctor", data.isDoctor);
+            
+            // Controla la vista segons el rol
+            if (data.isDoctor) {
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("doctorPanel").style.display = "block";
+                document.getElementById("grafanaContainer").style.display = "none";
+                    } else {
+                    document.getElementById("loginForm").style.display = "none";
+                    document.getElementById("doctorPanel").style.display = "none";
+                    document.getElementById("grafanaContainer").style.display = "block";
+                    document.getElementById("usernameDisplay").innerText = "Usuari: " + data.username;
+
+                    carregarGrafanaInici(data.user_id, data.radar_id); 
+                } 
+            })
+            .catch(error => {
+                console.error("Error en la connexió amb el servidor:", error);
+                document.getElementById("spinnerOverlay").style.display = "none";
+                document.getElementById("errorMsg").innerText = "Error de connexió!";
+                localStorage.clear();
+            });     
+        }
+
+        // Inicialitza Grafana amb rang de 12 hores per defecte
+        function carregarGrafanaInici(user_id, radar_id) {
+             carregarGrafana(user_id, radar_id, "now-12h", "now");
+        }
+
+        // Càrrega dels panells de Grafana 
+        function carregarGrafana(user_id, radar_id, fromTime, toTime) {
+            let baseGrafanaURL = "http://localhost:3000/d-solo/cee8c934oesjkc/radar";
+            let params = `?orgId=1&from=${fromTime}&to=${toTime}&refresh=5s&theme=light&var-user_id=${user_id}&var-radar_id=${radar_id}`;
+           
+            document.getElementById("grafanaFrame1").src = baseGrafanaURL + params + "&panelId=9";
+            document.getElementById("grafanaFrame2").src = baseGrafanaURL + params + "&panelId=8";
+            document.getElementById("grafanaFrame3").src = baseGrafanaURL + params + "&panelId=10";
+            document.getElementById("grafanaFrame4").src = baseGrafanaURL + params + "&panelId=7";
+        }
+
+        // Tanca sessió per usuari
+        function tancarSessio() {
+            localStorage.clear();
+
+            // Tornem a mostrar el formulari d'inici de sessió
+            document.getElementById("loginForm").style.display = "block";
+            document.getElementById("grafanaContainer").style.display = "none";
+            document.getElementById("usernameDisplay").innerText = "";
+        }
+        
+        // Tanca sessió per metge
+        function tancarSessioMetge() {
+            localStorage.removeItem("isDoctor");
+            localStorage.removeItem("user_id");
+            localStorage.removeItem("radar_id");
+            localStorage.removeItem("username");
+
+            // Tornem a mostrar el formulari d'inici de sessió
+            document.getElementById("doctorPanel").style.display = "none";
+            document.getElementById("loginForm").style.display = "block";
+        }
+        
+        // Funció per registrar un nou usuari (només admin)
+        function registrarUsuari() {
+            const isDoctor = localStorage.getItem("isDoctor") === "true";
+        if (!isDoctor) {
+            alert("Només el metge pot registrar usuaris.");
+            return;
+        }
+        console.log("Registrar usuari...");
+        console.log("newUsername:", document.getElementById("newUsername"));
+        console.log("newRadarID:", document.getElementById("newRadarID"));
+
+        const username = document.getElementById("newUsername").value;
+        const radar_id = parseInt(document.getElementById("newRadarID").value);
+    
+    
+    if (!username || isNaN(radar_id)) {
+        alert("Falten dades: introdueix un nom d'usuari i un radar_id.");
+        return;
+    }
+    document.getElementById("spinnerOverlay").style.display = "flex";
+            fetch("http://localhost:3001/registre", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    username: username,
+                    radar_id: radar_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("spinnerOverlay").style.display = "none";
+                if (data.error) {
+                document.getElementById("doctorErrorMsg").innerText = data.error;
+            } else {
+                alert("Usuari registrat amb èxit! Usuari: " + username + " - ID: " + data.user_id + " - Contrasenya: " + data.password);
+                document.getElementById("newUsername").value = "";
+                document.getElementById("newRadarID").value = "";
+                document.getElementById("doctorErrorMsg").innerText = "";
+            }
+            })
+            .catch(error => {
+                document.getElementById("spinnerOverlay").style.display = "none";
+                console.error("Error en el registre:", error);
+                alert("Error en registrar l'usuari");
+            });
+    }
+        
+        // Estableix el rang de temps per a la visualització de Grafana
+        function establirTemps(temps) {
+            let now = new Date().getTime();
+            let fromTime;
+            let toTime = now;
+
+            switch(temps) {
+                case '1d':
+                    fromTime = now - (24 * 60 * 60 * 1000); // 1 dia
+                    break;
+                case '12h':
+                    fromTime = now - (12 * 60 * 60 * 1000); // 12 hores
+                    break;
+                case '1h':
+                    fromTime = now - (60 * 60 * 1000); // 1 hora
+                    break;
+                case '15m':
+                    fromTime = now - (15 * 60 * 1000); // 15 minuts
+                    break;
+                default:
+                    return;
+            }
+
+            let user_id = localStorage.getItem("user_id");
+            let radar_id = localStorage.getItem("radar_id");
+
+            carregarGrafana(user_id, radar_id, fromTime, toTime);
+        }
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>Accés a la informació de l'usuari</h2>
+
+    <!-- Formulari d'autenticació d'usuaris -->
+    <div id="loginForm" class="login-form" style="display:block;">
+        <h2>Inici sessió</h2>
+        <label for="username">Nom d'Usuari:</label>
+        <input type="text" id="username" placeholder="Usuari">
+        <label for="password">Contrasenya:</label>
+        <input type="password" id="password" placeholder="Contrasenya">
+        <button onclick="iniciarSessio()">Iniciar Sessió</button>
+        <!-- Mostra missatge d'error si les credencials són incorrectes -->
+        <div id="errorMsg"></div>
+    </div>
+
+    <!-- Panell de gestió exclusiu per al metge -->
+    <div id="doctorPanel" class="doctor-panel" style="display:none;">
+        <h2>Registrar un nou usuari</h2>
+        <!-- Nom d'usuari nou -->
+        <label for="newUsername">Nom d'Usuari:</label>
+        <input type="text" id="newUsername">
+        <!-- Radar ID associat a l'usuari -->
+        <label for="newRadarID">Radar ID:</label>
+        <input type="number" id="newRadarID">
+        <!-- Botó per registrar el nou usuari -->
+        <button onclick="registrarUsuari()">Registrar Usuari</button>
+        <!-- Botó per tancar sessió com a metge -->
+        <button onclick="tancarSessioMetge()">Tancar Sessió</button>
+        <!-- Missatges d'error durant el registre -->
+        <div id="doctorErrorMsg"></div>
+    </div>
+    <!-- Indicador de càrrega durant peticions a backend -->
+    <div id="spinnerOverlay" style="display:none;">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Contenidor per als panells de Grafana -->
+    <div id="grafanaContainer" class="grafana-box" style="display:none;">
+         <!-- Informació de l’usuari i botó per sortir -->
+        <div id="userInfo">
+            <span id="usernameDisplay" class="username-display"></span>
+            <button id="logoutButton" onclick="tancarSessio()">Sortir</button>
+        </div>
+
+         <!-- Botons per seleccionar el rang de temps de visualització -->
+        <div class="time-controls">
+            <button id="timeButton" onclick="establirTemps('1d')">1 dia</button>
+            <button id="timeButton" onclick="establirTemps('12h')">12 hores</button>
+            <button id="timeButton" onclick="establirTemps('1h')">1 hora</button>
+            <button id="timeButton" onclick="establirTemps('15m')">15 minuts</button>
+        </div>
+        
+        <!-- Visualització de diferents panells de Grafana incrustats -->
+        <h3>Resum:</h3>
+        <iframe id="grafanaFrame2" width="800" height="400" frameborder="0"></iframe>
+        <h3>Freqüència respiratòria:</h3>
+        <iframe id="grafanaFrame1" width="800" height="400" frameborder="0"></iframe>
+        <h3>Freqüència cardiaca:</h3>
+        <iframe id="grafanaFrame3" width="800" height="400" frameborder="0"></iframe>
+        <h3>Moviments:</h3>
+        <iframe id="grafanaFrame4" width="800" height="400" frameborder="0"></iframe>
+    </div>
+</div>
+</body>
+</html>
